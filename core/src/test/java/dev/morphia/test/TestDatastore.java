@@ -148,8 +148,8 @@ public class TestDatastore extends TestBase {
         assertEquals(delete, book);
     }
 
-    @SuppressWarnings("removal")
     @Test
+    @SuppressWarnings("removal")
     public void testAlternateCollectionsWithLegacyQuery() {
         withOptions(MapperOptions.legacy().build(), () -> {
             final String alternateName = "alternate";

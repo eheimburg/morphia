@@ -313,14 +313,14 @@ class MorphiaQuery<T> implements Query<T> {
     }
 
     @NonNull
-    private <E> FindIterable<E> iterable(FindOptions findOptions, MongoCollection<E> collection) {
+    private <E> FindIterable<E> iterable(FindOptions options, MongoCollection<E> collection) {
         final Document query = toDocument();
 
         if (LOG.isTraceEnabled()) {
-            LOG.trace(format("Running query(%s) : %s, options: %s,", getCollectionName(), query, findOptions));
+            LOG.trace(format("Running query(%s) : %s, options: %s,", getCollectionName(), query.toJson(), options));
         }
 
-        MongoCollection<E> updated = datastore.configureCollection(findOptions, collection);
+        MongoCollection<E> updated = datastore.configureCollection(options, collection);
 
         return datastore.operations().find(updated, query);
     }

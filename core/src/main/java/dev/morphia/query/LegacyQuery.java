@@ -482,12 +482,9 @@ public class LegacyQuery<T> implements CriteriaContainer, Query<T> {
             LOG.trace(format("Running query(%s) : %s, options: %s,", getCollectionName(), query.toJson(), options));
         }
 
-        if ((options.cursorType() != null && options.cursorType() != NonTailable)
-                && (options.sort() != null)) {
-            LOG.warn("Sorting on tail is not allowed.");
-        }
+        MongoCollection<E> updated = datastore.configureCollection(options, collection);
 
-        return datastore.operations().find(collection, query);
+        return datastore.operations().find(updated, query);
     }
 
     private <E> MongoCursor<E> prepareCursor(FindOptions options, MongoCollection<E> collection) {
