@@ -60,7 +60,6 @@ public class EntityDecoder<T> implements Decoder<T> {
                 } else {
                     Object value = decoderContext.decodeWithChildContext(model.getCodec(), reader);
                     if (model.getMappedName().equals("_id")) {
-                        System.out.println("get cache: Thread.currentThread().getId() = " + Thread.currentThread().getId());
                         var entity = EntityCache.get().get(value);
                         if (entity != null) {
                             instanceCreator.setInstance(entity);

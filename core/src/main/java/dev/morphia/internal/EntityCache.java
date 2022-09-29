@@ -12,7 +12,6 @@ public class EntityCache implements AutoCloseable {
     private final boolean secondary;
 
     private EntityCache() {
-        System.out.println("new cache:  Thread.currentThread().getId() = " + Thread.currentThread().getId());
         EntityCache current = reference.get();
         secondary = current != null;
         if (secondary) {
@@ -26,7 +25,6 @@ public class EntityCache implements AutoCloseable {
     @Override
     public void close() {
         if (!secondary) {
-            System.out.println("clear cache:  Thread.currentThread().getId() = " + Thread.currentThread().getId());
             reference.remove();
         }
     }
