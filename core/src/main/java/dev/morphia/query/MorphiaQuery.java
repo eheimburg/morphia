@@ -16,6 +16,7 @@ import dev.morphia.ModifyOptions;
 import dev.morphia.UpdateOptions;
 import dev.morphia.aggregation.stages.Stage;
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.mapping.codec.writer.DocumentWriter;
 import dev.morphia.query.filters.Filter;
@@ -215,7 +216,9 @@ class MorphiaQuery<T> implements Query<T> {
 
     @Override
     public MorphiaCursor<T> iterator(FindOptions options) {
-        return new MorphiaCursor<>(prepareCursor(options, collection));
+        try (var cache = EntityCache.get()) {
+            return new MorphiaCursor<>(prepareCursor(options, collection), cache);
+        }
     }
 
     @Override
@@ -339,7 +342,6 @@ class MorphiaQuery<T> implements Query<T> {
                         .append("slowms", oldProfile.get("slowms"))
                         .append("sampleRate", oldProfile.get("sampleRate")));
             }
-
         }
     }
 

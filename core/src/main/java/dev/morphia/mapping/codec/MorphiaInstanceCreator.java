@@ -1,5 +1,6 @@
 package dev.morphia.mapping.codec;
 
+import com.mongodb.lang.NonNull;
 import com.mongodb.lang.Nullable;
 import dev.morphia.annotations.internal.MorphiaInternal;
 import dev.morphia.mapping.codec.pojo.PropertyModel;
@@ -16,11 +17,13 @@ public interface MorphiaInstanceCreator {
      */
     Object getInstance();
 
+    void setInstance(Object entity);
+
     /**
      * Sets a value for the given FieldModel
      *
      * @param value the value
      * @param model the model
      */
-    void set(@Nullable Object value, PropertyModel model);
+    void set(@Nullable Object value, @NonNull PropertyModel model);
 }

@@ -16,6 +16,7 @@ import com.mongodb.lang.NonNull;
 import dev.morphia.Datastore;
 import dev.morphia.DatastoreImpl;
 import dev.morphia.Morphia;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.mapping.MapperOptions;
 import dev.morphia.mapping.codec.ZonedDateTimeCodec;
@@ -65,7 +66,6 @@ public abstract class TestBase {
     private static MongoClient mongoClient;
 
     private MapperOptions mapperOptions;
-    private MongoDatabase database;
     private DatastoreImpl datastore;
 
     public TestBase() {
@@ -84,7 +84,6 @@ public abstract class TestBase {
     }
 
     protected void cleanup() {
-        database = null;
         datastore = null;
         MongoDatabase db = getDatabase();
         db.runCommand(new Document("profile", 0).append("slowms", 0));
@@ -96,10 +95,7 @@ public abstract class TestBase {
     }
 
     public MongoDatabase getDatabase() {
-        if (database == null) {
-            database = getDs().getDatabase();
-        }
-        return database;
+        return getDs().getDatabase();
     }
 
     public DatastoreImpl getDs() {
@@ -322,6 +318,7 @@ public abstract class TestBase {
 
         DocumentReader reader = new DocumentReader(document);
 
+        var cache = EntityCache.get();
         return getDs().getCodecRegistry()
                 .get(aClass)
                 .decode(reader, DecoderContext.builder().build());
@@ -395,13 +392,11 @@ public abstract class TestBase {
         MapperOptions previousOptions = mapperOptions;
         try {
             mapperOptions = options;
-            database = null;
             datastore = null;
 
             block.run();
         } finally {
             mapperOptions = previousOptions;
-            database = null;
             datastore = null;
         }
     }

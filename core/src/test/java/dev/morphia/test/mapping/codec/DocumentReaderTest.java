@@ -5,6 +5,7 @@ import dev.morphia.EntityInterceptor;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import dev.morphia.annotations.PreLoad;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.codec.reader.DocumentReader;
 import dev.morphia.mapping.codec.reader.NameState;
 import dev.morphia.mapping.codec.reader.ValueState;
@@ -90,6 +91,7 @@ public class DocumentReaderTest extends TestBase {
 
         Document first = collection.find().first();
 
+        var cache = EntityCache.get();
         Parent decode = getDs().getCodecRegistry().get(Parent.class)
                 .decode(new DocumentReader(first), DecoderContext.builder().build());
 

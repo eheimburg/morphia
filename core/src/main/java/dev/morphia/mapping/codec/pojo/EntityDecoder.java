@@ -2,6 +2,7 @@ package dev.morphia.mapping.codec.pojo;
 
 import com.mongodb.lang.Nullable;
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.DiscriminatorLookup;
 import dev.morphia.mapping.codec.MorphiaInstanceCreator;
 import org.bson.BsonInvalidOperationException;
@@ -58,7 +59,18 @@ public class EntityDecoder<T> implements Decoder<T> {
                     reader.readNull();
                 } else {
                     Object value = decoderContext.decodeWithChildContext(model.getCodec(), reader);
-                    instanceCreator.set(value, model);
+                    if (model.getMappedName().equals("_id")) {
+                        System.out.println("get cache: Thread.currentThread().getId() = " + Thread.currentThread().getId());
+                        var entity = EntityCache.get().get(value);
+                        if (entity != null) {
+                            instanceCreator.setInstance(entity);
+                            skipToEndOfDocument(reader);
+                        } else {
+                            instanceCreator.set(value, model);
+                        }
+                    } else {
+                        instanceCreator.set(value, model);
+                    }
                 }
             } catch (BsonInvalidOperationException e) {
                 mark.reset();
@@ -66,6 +78,13 @@ public class EntityDecoder<T> implements Decoder<T> {
                 instanceCreator.set(convert(value, model.getTypeData().getType()), model);
             }
         } else {
+            reader.skipValue();
+        }
+    }
+
+    private void skipToEndOfDocument(BsonReader reader) {
+        while (reader.getCurrentBsonType() != BsonType.END_OF_DOCUMENT) {
+            reader.skipName();
             reader.skipValue();
         }
     }

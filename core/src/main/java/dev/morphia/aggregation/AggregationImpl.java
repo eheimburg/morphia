@@ -45,6 +45,7 @@ import dev.morphia.aggregation.stages.UnionWith;
 import dev.morphia.aggregation.stages.Unset;
 import dev.morphia.aggregation.stages.Unwind;
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.codec.pojo.EntityModel;
 import dev.morphia.mapping.codec.reader.DocumentReader;
 import dev.morphia.mapping.codec.writer.DocumentWriter;
@@ -157,6 +158,7 @@ public class AggregationImpl<T> implements Aggregation<T> {
         if (LOG.isDebugEnabled()) {
             LOG.debug("pipeline = " + pipeline);
         }
+        var cache = EntityCache.get();
         if (datastore.getMapper().isMappable(resultType) && !resultType.equals(this.collection.getDocumentClass())) {
             MongoCollection<Document> collection = this.collection.withDocumentClass(Document.class);
             MongoCursor<Document> results = collection.aggregate(pipeline).iterator();
@@ -166,13 +168,14 @@ public class AggregationImpl<T> implements Aggregation<T> {
         } else {
             cursor = collection.aggregate(pipeline, resultType).iterator();
         }
-        return new MorphiaCursor<>(cursor);
+        return new MorphiaCursor<>(cursor, cache);
     }
 
     @Override
     public <R> MorphiaCursor<R> execute(Class<R> resultType, AggregationOptions options) {
+        var cache = EntityCache.get();
         return new MorphiaCursor<>(options.apply(pipeline(), collection, resultType)
-                .iterator());
+                .iterator(), cache);
     }
 
     @Override

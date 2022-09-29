@@ -109,6 +109,11 @@ public class MorphiaCodecProvider implements CodecProvider {
                             }
 
                             @Override
+                            public void setInstance(Object entity) {
+                                throw new UnsupportedOperationException();
+                            }
+
+                            @Override
                             public void set(@Nullable Object value, PropertyModel model) {
                                 model.getAccessor().set(entity, value);
                             }

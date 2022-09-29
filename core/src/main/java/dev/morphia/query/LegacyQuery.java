@@ -16,6 +16,7 @@ import dev.morphia.UpdateOptions;
 import dev.morphia.aggregation.stages.Stage;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.internal.MorphiaInternals.DriverVersion;
 import dev.morphia.mapping.codec.pojo.EntityModel;
 import dev.morphia.query.internal.MorphiaCursor;
@@ -283,7 +284,9 @@ public class LegacyQuery<T> implements CriteriaContainer, Query<T> {
 
     @Override
     public MorphiaCursor<T> iterator(FindOptions options) {
-        return new MorphiaCursor<>(prepareCursor(options, datastore.configureCollection(options, collection)));
+        try (var cache = EntityCache.get()) {
+            return new MorphiaCursor<>(prepareCursor(options, collection), cache);
+        }
     }
 
     @Override

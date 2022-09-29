@@ -4,6 +4,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.ServerCursor;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.lang.NonNull;
+import dev.morphia.internal.EntityCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +16,18 @@ import java.util.List;
 public class MorphiaCursor<T> implements MongoCursor<T> {
     private final MongoCursor<T> wrapped;
 
+    private final EntityCache cache;
+
     /**
      * Creates a MorphiaCursor
      *
      * @param cursor the Iterator to use
+     * @param cache
      */
-    public MorphiaCursor(MongoCursor<T> cursor) {
+    public MorphiaCursor(MongoCursor<T> cursor, EntityCache cache) {
         wrapped = cursor;
+        this.cache = cache;
+        cache.close();
     }
 
     /**
@@ -39,7 +45,16 @@ public class MorphiaCursor<T> implements MongoCursor<T> {
     @Override
     @NonNull
     public T next() {
-        return wrapped.next();
+        try (AutoCloseable cache = configureCache()) {
+            return wrapped.next();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private AutoCloseable configureCache() {
+        EntityCache.set(cache);
+        return cache;
     }
 
     @Override
@@ -49,7 +64,11 @@ public class MorphiaCursor<T> implements MongoCursor<T> {
 
     @Override
     public T tryNext() {
-        return wrapped.tryNext();
+        try (AutoCloseable cache = configureCache()) {
+            return wrapped.tryNext();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override

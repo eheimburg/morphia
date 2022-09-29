@@ -1,5 +1,6 @@
 package dev.morphia.mapping.internal;
 
+import com.mongodb.lang.NonNull;
 import com.mongodb.lang.Nullable;
 import dev.morphia.annotations.Name;
 import dev.morphia.annotations.PostLoad;
@@ -119,6 +120,11 @@ public class ConstructorCreator implements MorphiaInstanceCreator {
         return instance;
     }
 
+    @Override
+    public void setInstance(@NonNull Object entity) {
+        instance = entity;
+    }
+
     /**
      * @param model the model to check
      * @return the constructor taking all fields if it exists
@@ -156,7 +162,7 @@ public class ConstructorCreator implements MorphiaInstanceCreator {
     }
 
     @Override
-    public void set(@Nullable Object value, PropertyModel model) {
+    public void set(@Nullable Object value, @NonNull PropertyModel model) {
         if (instance != null) {
             model.setValue(instance, value);
         } else {

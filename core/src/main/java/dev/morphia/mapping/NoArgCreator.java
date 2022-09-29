@@ -47,4 +47,9 @@ public class NoArgCreator implements MorphiaInstanceCreator {
     public Object getInstance() {
         return instance();
     }
+
+    @Override
+    public void setInstance(Object instance) {
+        this.instance = instance;
+    }
 }
