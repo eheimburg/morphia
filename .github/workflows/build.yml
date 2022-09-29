@@ -29,7 +29,9 @@ jobs:
   Tests:
     name: "Test on JDK ${{ matrix.java }}, MDB: ${{ matrix.mongo }}, Driver: ${{ matrix.driver }})"
     runs-on: ubuntu-latest
-    needs: Build
+    needs:
+      - Build
+      - Quality
     strategy:
       matrix:
         java: [ 11, 17, 18 ]
