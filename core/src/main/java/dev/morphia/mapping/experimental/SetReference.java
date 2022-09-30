@@ -21,6 +21,7 @@ public class SetReference<T> extends CollectionReference<Set<T>> {
     private Set<T> values;
 
     /**
+     * @param cache       the entity cache
      * @param datastore   the datastore to use
      * @param mapper      the mapper to use
      * @param entityModel the entity's mapped class

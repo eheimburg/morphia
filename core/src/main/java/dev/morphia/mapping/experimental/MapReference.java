@@ -34,6 +34,7 @@ public class MapReference<T> extends MorphiaReference<Map<Object, T>> {
     private final Map<String, List<Object>> collections = new HashMap<>();
 
     /**
+     * @param cache       the entity cache
      * @param datastore   the datastore to use
      * @param mapper      the mapper to use
      * @param ids         the IDs of the entities

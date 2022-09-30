@@ -80,6 +80,9 @@ public abstract class MorphiaReference<T> {
      */
     public abstract List<Object> getIds();
 
+    /**
+     * @return the entity cache
+     */
     public EntityCache getCache() {
         return cache;
     }

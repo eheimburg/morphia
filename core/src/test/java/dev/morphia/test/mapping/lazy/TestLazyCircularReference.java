@@ -4,7 +4,6 @@ import dev.morphia.Datastore;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import dev.morphia.annotations.Reference;
-import dev.morphia.query.FindOptions;
 import dev.morphia.test.mapping.ProxyTestBase;
 import dev.morphia.test.models.TestEntity;
 import org.bson.types.ObjectId;
@@ -13,7 +12,6 @@ import org.testng.annotations.Test;
 import java.util.List;
 
 import static dev.morphia.query.filters.Filters.eq;
-import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
@@ -31,11 +29,11 @@ public class TestLazyCircularReference extends ProxyTestBase {
         getDs().save(List.of(bob, alice));
 
         Bob loadedBob = getDs().find(Bob.class)
-                        .filter(eq("_id", bob.id))
-                        .first();
+                .filter(eq("_id", bob.id))
+                .first();
         Alice loadedAlice = getDs().find(Alice.class)
-                          .filter(eq("_id", alice.id))
-                          .first();
+                .filter(eq("_id", alice.id))
+                .first();
 
         assertEquals(bob.name, alice.bob.name);
         loadedBob.name = "loaded";

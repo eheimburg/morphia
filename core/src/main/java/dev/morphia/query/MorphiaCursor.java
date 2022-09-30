@@ -5,6 +5,7 @@ import com.mongodb.ServerCursor;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.lang.NonNull;
 import dev.morphia.internal.EntityCache;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +23,9 @@ public class MorphiaCursor<T> implements MongoCursor<T> {
      * Creates a MorphiaCursor
      *
      * @param cursor the Iterator to use
-     * @param cache
+     * @param cache  the entity cache
      */
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public MorphiaCursor(MongoCursor<T> cursor, EntityCache cache) {
         wrapped = cursor;
         this.cache = cache;

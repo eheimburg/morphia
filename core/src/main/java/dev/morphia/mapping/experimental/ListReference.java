@@ -19,6 +19,7 @@ public class ListReference<T> extends CollectionReference<List<T>> {
     private List<T> values;
 
     /**
+     * @param cache     the entity cache
      * @param datastore the datastore to use
      * @param mapper    the mapper to use
      * @param ids       the IDs of the entities
