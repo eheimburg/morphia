@@ -4,6 +4,7 @@ import com.mongodb.DBRef;
 import com.mongodb.lang.Nullable;
 import dev.morphia.Datastore;
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.mapping.MappingException;
 import dev.morphia.mapping.codec.pojo.EntityModel;
@@ -37,8 +38,8 @@ public class SingleReference<T> extends MorphiaReference<T> {
      * @morphia.internal
      */
     @MorphiaInternal
-    public SingleReference(Datastore datastore, Mapper mapper, EntityModel entityModel, Object id) {
-        super(datastore, mapper);
+    public SingleReference(EntityCache cache, Datastore datastore, Mapper mapper, EntityModel entityModel, Object id) {
+        super(cache, datastore, mapper);
         this.entityModel = entityModel;
         this.id = id;
         if (entityModel.getType().isInstance(id)) {
@@ -74,13 +75,19 @@ public class SingleReference<T> extends MorphiaReference<T> {
         final EntityModel entityModel = mapper.getEntityModel(paramType);
         Object id = document.get(mappedField.getMappedName());
 
-        return new SingleReference<>(datastore, mapper, entityModel, id);
+        return new SingleReference<>(EntityCache.get(), datastore, mapper, entityModel, id);
     }
 
     @Override
     public T get() {
         if (!isResolved() && value == null && id != null) {
-            value = (T) buildQuery().iterator().tryNext();
+            value = (T) getCache().get(getId());
+            if (value == null) {
+                value = (T) buildQuery().iterator().tryNext();
+                if (value != null) {
+                    getCache().set(getId(), value);
+                }
+            }
             if (value == null && !ignoreMissing()) {
                 throw new ReferenceException(
                         Sofia.missingReferencedEntity(entityModel.getType().getSimpleName()));

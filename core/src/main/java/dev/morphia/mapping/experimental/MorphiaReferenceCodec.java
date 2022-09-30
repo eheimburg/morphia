@@ -2,6 +2,7 @@ package dev.morphia.mapping.experimental;
 
 import com.mongodb.lang.Nullable;
 import dev.morphia.Datastore;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.mapping.codec.BaseReferenceCodec;
 import dev.morphia.mapping.codec.pojo.EntityModel;
@@ -49,6 +50,7 @@ public class MorphiaReferenceCodec extends BaseReferenceCodec<MorphiaReference> 
 
     @Override
     public MorphiaReference decode(BsonReader reader, DecoderContext decoderContext) {
+        EntityCache cache = EntityCache.get();
         Object value = getDatastore().getCodecRegistry()
                 .get(bsonTypeClassMap.get(reader.getCurrentBsonType()))
                 .decode(reader, decoderContext);
@@ -56,13 +58,13 @@ public class MorphiaReferenceCodec extends BaseReferenceCodec<MorphiaReference> 
         TypeData typeData = getTypeData().getTypeParameters().get(0);
         EntityModel fieldEntityModel = getEntityModelForField();
         if (Set.class.isAssignableFrom(typeData.getType())) {
-            return new SetReference<>(getDatastore(), mapper, fieldEntityModel, (List) value);
+            return new SetReference<>(cache, getDatastore(), mapper, fieldEntityModel, (List) value);
         } else if (Collection.class.isAssignableFrom(typeData.getType())) {
-            return new ListReference<>(getDatastore(), mapper, fieldEntityModel, (List) value);
+            return new ListReference<>(cache, getDatastore(), mapper, fieldEntityModel, (List) value);
         } else if (Map.class.isAssignableFrom(typeData.getType())) {
-            return new MapReference<>(getDatastore(), mapper, (Map) value, fieldEntityModel);
+            return new MapReference<>(cache, getDatastore(), mapper, (Map) value, fieldEntityModel);
         } else {
-            return new SingleReference<>(getDatastore(), mapper, fieldEntityModel, value);
+            return new SingleReference<>(cache, getDatastore(), mapper, fieldEntityModel, value);
         }
     }
 

@@ -2,6 +2,7 @@ package dev.morphia.mapping.experimental;
 
 import dev.morphia.Datastore;
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.mapping.codec.pojo.EntityModel;
 
@@ -27,8 +28,8 @@ public class SetReference<T> extends CollectionReference<Set<T>> {
      * @morphia.internal
      */
     @MorphiaInternal
-    public SetReference(Datastore datastore, Mapper mapper, EntityModel entityModel, List ids) {
-        super(datastore, mapper, entityModel, ids);
+    public SetReference(EntityCache cache, Datastore datastore, Mapper mapper, EntityModel entityModel, List ids) {
+        super(cache, datastore, mapper, entityModel, ids);
     }
 
     /**

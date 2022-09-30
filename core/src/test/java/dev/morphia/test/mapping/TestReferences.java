@@ -24,7 +24,6 @@ import dev.morphia.test.models.methods.MethodMappedFriend;
 import dev.morphia.test.models.methods.MethodMappedUser;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -50,7 +49,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
 public class TestReferences extends ProxyTestBase {
@@ -271,10 +269,11 @@ public class TestReferences extends ProxyTestBase {
 
         assertIsProxy(p);
         assertNotFetched(p);
+        assertEquals(p.getId(), root.r.id);
+        assertNotFetched(p);
         p.getFoo();
         // should be fetched now.
         assertFetched(p);
-
     }
 
     @Test
@@ -465,7 +464,7 @@ public class TestReferences extends ProxyTestBase {
     }
 
     @Test
-    @Ignore("entity caching needs to be implemented")
+    //    @Ignore("entity caching needs to be implemented")
     public final void testSameProxy() {
         checkForProxyTypes();
 
@@ -482,7 +481,10 @@ public class TestReferences extends ProxyTestBase {
         root = getDs().find(RootEntity.class)
                 .filter(eq("_id", root.getId()))
                 .first();
-        assertSame(root.r, root.secondReference);
+        root.r.setFoo("post load");
+        assertEquals(root.r, root.secondReference);
+        root.secondReference.setFoo("second setting");
+        assertEquals(root.r, root.secondReference);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package dev.morphia.mapping;
 
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.codec.MorphiaInstanceCreator;
 import dev.morphia.mapping.codec.pojo.PropertyModel;
 import dev.morphia.sofia.Sofia;
@@ -13,6 +14,8 @@ import java.lang.reflect.Constructor;
  */
 @MorphiaInternal
 public class NoArgCreator implements MorphiaInstanceCreator {
+    private boolean cached;
+
     private Object instance;
     private final Constructor<?> noArgsConstructor;
 
@@ -29,7 +32,13 @@ public class NoArgCreator implements MorphiaInstanceCreator {
 
     @Override
     public void set(Object value, PropertyModel model) {
-        model.getAccessor().set(instance(), value);
+        if (model.getMappedName().equals("_id")) {
+            instance = EntityCache.get().get(value);
+            cached = true;
+        }
+        if (!cached) {
+            model.getAccessor().set(instance(), value);
+        }
     }
 
     private Object instance() {

@@ -4,6 +4,7 @@ import com.mongodb.lang.Nullable;
 import dev.morphia.Datastore;
 import dev.morphia.annotations.Handler;
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.mapping.codec.pojo.EntityModel;
 
@@ -25,6 +26,9 @@ import java.util.StringJoiner;
 @Deprecated(forRemoval = true, since = "2.3")
 public abstract class MorphiaReference<T> {
     private Datastore datastore;
+
+    private EntityCache cache;
+
     private Mapper mapper;
     private boolean ignoreMissing;
     private boolean resolved;
@@ -32,7 +36,8 @@ public abstract class MorphiaReference<T> {
     MorphiaReference() {
     }
 
-    MorphiaReference(Datastore datastore, Mapper mapper) {
+    MorphiaReference(EntityCache cache, Datastore datastore, Mapper mapper) {
+        this.cache = cache;
         this.mapper = mapper;
         this.datastore = datastore;
     }
@@ -74,6 +79,10 @@ public abstract class MorphiaReference<T> {
      * @return the referenced IDs
      */
     public abstract List<Object> getIds();
+
+    public EntityCache getCache() {
+        return cache;
+    }
 
     protected Datastore getDatastore() {
         return datastore;

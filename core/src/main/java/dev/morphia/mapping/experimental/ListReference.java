@@ -2,6 +2,7 @@ package dev.morphia.mapping.experimental;
 
 import dev.morphia.Datastore;
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.mapping.codec.pojo.EntityModel;
 
@@ -25,8 +26,8 @@ public class ListReference<T> extends CollectionReference<List<T>> {
      * @morphia.internal
      */
     @MorphiaInternal
-    public ListReference(Datastore datastore, Mapper mapper, EntityModel model, List ids) {
-        super(datastore, mapper, model, ids);
+    public ListReference(EntityCache cache, Datastore datastore, Mapper mapper, EntityModel model, List ids) {
+        super(cache, datastore, mapper, model, ids);
     }
 
     /**

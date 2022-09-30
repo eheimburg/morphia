@@ -8,6 +8,7 @@ import dev.morphia.annotations.PostPersist;
 import dev.morphia.annotations.PreLoad;
 import dev.morphia.annotations.PrePersist;
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.MappingException;
 import dev.morphia.mapping.codec.Conversions;
 import dev.morphia.mapping.codec.MorphiaInstanceCreator;
@@ -44,6 +45,9 @@ public class ConstructorCreator implements MorphiaInstanceCreator {
     private final EntityModel model;
     private final Map<String, BiFunction<Object[], Object, Void>> positions = new LinkedHashMap<>();
     private final List<Consumer<Object>> setFunctions = new ArrayList<>();
+
+    private boolean cached;
+
     private Object instance;
 
     /**
@@ -163,16 +167,26 @@ public class ConstructorCreator implements MorphiaInstanceCreator {
 
     @Override
     public void set(@Nullable Object value, @NonNull PropertyModel model) {
-        if (instance != null) {
-            model.setValue(instance, value);
-        } else {
-            BiFunction<Object[], Object, Void> function = positions.get(model.getName());
-            if (function != null) {
-                function.apply(parameters, value);
+        if (value != null && model.getMappedName().equals("_id")) {
+            var cachedEntity = EntityCache.get().get(value);
+            cached = cachedEntity != null;
+            if (cached) {
+                instance = cachedEntity;
             }
-            setFunctions.add((instance) -> {
+        }
+
+        if (!cached) {
+            if (instance != null) {
                 model.setValue(instance, value);
-            });
+            } else {
+                BiFunction<Object[], Object, Void> function = positions.get(model.getName());
+                if (function != null) {
+                    function.apply(parameters, value);
+                }
+                setFunctions.add((instance) -> {
+                    model.setValue(instance, value);
+                });
+            }
         }
     }
 

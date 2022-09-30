@@ -42,4 +42,9 @@ public class EntityCache implements AutoCloseable {
     public Object get(Object idValue) {
         return cache.get(idValue);
     }
+
+    @Nullable
+    public Object set(Object id, Object value) {
+        return cache.putIfAbsent(id, value);
+    }
 }

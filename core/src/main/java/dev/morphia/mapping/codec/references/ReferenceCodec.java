@@ -7,6 +7,7 @@ import dev.morphia.Datastore;
 import dev.morphia.Key;
 import dev.morphia.annotations.Reference;
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.mapping.MappingException;
 import dev.morphia.mapping.codec.BaseReferenceCodec;
@@ -335,19 +336,20 @@ public class ReferenceCodec extends BaseReferenceCodec<Object> implements Proper
     @Nullable
     private Object fetch(Object value) {
         MorphiaReference<?> reference;
+        EntityCache cache = EntityCache.get();
         final Class<?> type = getPropertyModel().getType();
         if (List.class.isAssignableFrom(type)) {
-            reference = readList((List<?>) value);
+            reference = readList(cache, (List<?>) value);
         } else if (Map.class.isAssignableFrom(type)) {
-            reference = readMap((Map<Object, Object>) value);
+            reference = readMap(cache, (Map<Object, Object>) value);
         } else if (Set.class.isAssignableFrom(type)) {
-            reference = readSet((List<?>) value);
+            reference = readSet(cache, (List<?>) value);
         } else if (type.isArray()) {
-            reference = readList((List<?>) value);
+            reference = readList(cache, (List<?>) value);
         } else if (value instanceof Document) {
-            reference = readDocument((Document) value);
+            reference = readDocument(cache, (Document) value);
         } else {
-            reference = readSingle(value);
+            reference = readSingle(cache, value);
         }
         reference.ignoreMissing(annotation.ignoreMissing());
 
@@ -362,37 +364,37 @@ public class ReferenceCodec extends BaseReferenceCodec<Object> implements Proper
                 .collect(Collectors.toList());
     }
 
-    MorphiaReference<?> readDocument(Document value) {
+    MorphiaReference<?> readDocument(EntityCache cache, Document value) {
         final Object id = getDatastore().getCodecRegistry().get(Object.class)
                 .decode(new DocumentReader(value), DecoderContext.builder().build());
-        return readSingle(id);
+        return readSingle(cache, id);
     }
 
-    MorphiaReference<?> readList(List<?> value) {
+    MorphiaReference<?> readList(EntityCache cache, List<?> value) {
         List<?> mapped = mapToEntitiesIfNecessary(value);
         return mapped.isEmpty()
-                ? new ListReference<>(getDatastore(), mapper, getEntityModelForField(), value)
+                ? new ListReference<>(cache, getDatastore(), mapper, getEntityModelForField(), value)
                 : new ListReference<>(mapped);
     }
 
-    MorphiaReference<?> readMap(Map<Object, Object> value) {
+    MorphiaReference<?> readMap(EntityCache cache, Map<Object, Object> value) {
         final Map<Object, Object> ids = new LinkedHashMap<>();
         Class<?> keyType = getTypeData().getTypeParameters().get(0).getType();
         for (Entry<Object, Object> entry : value.entrySet()) {
             ids.put(Conversions.convert(entry.getKey(), keyType), entry.getValue());
         }
 
-        return new MapReference(getDatastore(), mapper, ids, getEntityModelForField());
+        return new MapReference(cache, getDatastore(), mapper, ids, getEntityModelForField());
     }
 
-    MorphiaReference<?> readSet(List<?> value) {
+    MorphiaReference<?> readSet(EntityCache cache, List<?> value) {
         List<?> mapped = mapToEntitiesIfNecessary(value);
         return mapped.isEmpty()
-                ? new SetReference<>(getDatastore(), getDatastore().getMapper(), getEntityModelForField(), value)
+                ? new SetReference<>(cache, getDatastore(), getDatastore().getMapper(), getEntityModelForField(), value)
                 : new SetReference<>(new LinkedHashSet<>(mapped));
     }
 
-    MorphiaReference<?> readSingle(Object value) {
-        return new SingleReference<>(getDatastore(), mapper, getEntityModelForField(), value);
+    MorphiaReference<?> readSingle(EntityCache cache, Object value) {
+        return new SingleReference<>(cache, getDatastore(), mapper, getEntityModelForField(), value);
     }
 }

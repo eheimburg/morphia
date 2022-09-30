@@ -1,49 +1,81 @@
 package dev.morphia.test.mapping.lazy;
 
 import dev.morphia.Datastore;
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Id;
 import dev.morphia.annotations.Reference;
 import dev.morphia.query.FindOptions;
 import dev.morphia.test.mapping.ProxyTestBase;
 import dev.morphia.test.models.TestEntity;
 import org.bson.types.ObjectId;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
+
+import java.util.List;
 
 import static dev.morphia.query.filters.Filters.eq;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 
 @Test(groups = "references")
-@Ignore("references need caching")
 public class TestLazyCircularReference extends ProxyTestBase {
 
     public void testCircularReferences() {
-        RootEntity root = new RootEntity();
-        ReferencedEntity first = new ReferencedEntity();
-        ReferencedEntity second = new ReferencedEntity();
+        getMapper().map(Bob.class, Alice.class);
+        var bob = new Bob();
+        var alice = new Alice();
+        getDs().save(List.of(bob, alice));
 
-        getDs().save(asList(root, first, second));
-        root.r = first;
-        root.secondReference = second;
-        first.parent = root;
-        second.parent = root;
+        bob.alice = alice;
+        alice.bob = bob;
+        getDs().save(List.of(bob, alice));
 
-        getDs().save(asList(root, first, second));
+        Bob loadedBob = getDs().find(Bob.class)
+                        .filter(eq("_id", bob.id))
+                        .first();
+        Alice loadedAlice = getDs().find(Alice.class)
+                          .filter(eq("_id", alice.id))
+                          .first();
 
-        RootEntity rootEntity = getDs().find(RootEntity.class).iterator(new FindOptions().limit(1)).tryNext();
-        assertEquals(first.getId(), rootEntity.getR().getId());
-        assertEquals(second.getId(), rootEntity.getSecondReference().getId());
-        assertEquals(root.getId(), rootEntity.getR().getParent().getId());
+        assertEquals(bob.name, alice.bob.name);
+        loadedBob.name = "loaded";
+        assertEquals(bob.name, alice.bob.name);
+
+        assertEquals(bob.alice.name, bob.alice.bob.alice.name);
+        bob.alice.name = "alice loaded";
+        assertEquals(bob.alice.name, bob.alice.bob.alice.name);
+
+        assertNotEquals(bob.alice.name, loadedAlice.name);
+    }
+
+    @Entity
+    public static class Bob {
+        @Id
+        private ObjectId id;
+        @Reference(lazy = true)
+        private Alice alice;
+        private String name;
+    }
+
+    @Entity
+    public static class Alice {
+        @Id
+        private ObjectId id;
+        @Reference(lazy = true)
+        private Bob bob;
+        private String name;
     }
 
     public void testGetKeyWithoutFetching() {
         checkForProxyTypes();
 
         RootEntity root = new RootEntity();
+        getDs().save(root);
+
         final ReferencedEntity reference = new ReferencedEntity();
         reference.parent = root;
 
-        root.r = reference;
+        root.reference = reference;
         reference.setFoo("bar");
 
         final ObjectId id = getDs().save(reference).getId();
@@ -54,27 +86,28 @@ public class TestLazyCircularReference extends ProxyTestBase {
                 .filter(eq("_id", root.getId()))
                 .first();
 
-        final ReferencedEntity p = root.r;
+        final ReferencedEntity referenced = root.reference;
 
-        assertIsProxy(p);
-        assertNotFetched(p);
-        p.getFoo();
-        assertFetched(p);
-
+        assertIsProxy(referenced);
+        assertNotFetched(referenced);
+        assertEquals(referenced.getId(), id);
+        assertNotFetched(referenced);
+        referenced.getFoo();
+        assertFetched(referenced);
     }
 
     public static class RootEntity extends TestEntity {
         @Reference(lazy = true)
-        private ReferencedEntity r;
+        private ReferencedEntity reference;
         @Reference(lazy = true)
         private ReferencedEntity secondReference;
 
-        public ReferencedEntity getR() {
-            return r;
+        public ReferencedEntity getReference() {
+            return reference;
         }
 
-        public void setR(ReferencedEntity r) {
-            this.r = r;
+        public void setReference(ReferencedEntity reference) {
+            this.reference = reference;
         }
 
         public ReferencedEntity getSecondReference() {

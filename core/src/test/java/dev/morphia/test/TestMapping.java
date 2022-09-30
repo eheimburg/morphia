@@ -753,7 +753,7 @@ public class TestMapping extends TestBase {
 
     @Test
     //    @Tag("references")
-    @Ignore("entity caching needs to be implemented")
+    //    @Ignore("entity caching needs to be implemented")
     public void testRecursiveReference() {
         /*
          * getMapper().map(RecursiveParent.class, RecursiveChild.class);

@@ -4,6 +4,7 @@ import com.mongodb.DBRef;
 import com.mongodb.client.MongoCursor;
 import dev.morphia.Datastore;
 import dev.morphia.annotations.internal.MorphiaInternal;
+import dev.morphia.internal.EntityCache;
 import dev.morphia.mapping.Mapper;
 import dev.morphia.mapping.codec.pojo.EntityModel;
 import dev.morphia.mapping.codec.pojo.PropertyModel;
@@ -40,8 +41,8 @@ public class MapReference<T> extends MorphiaReference<Map<Object, T>> {
      * @morphia.internal
      */
     @MorphiaInternal
-    public MapReference(Datastore datastore, Mapper mapper, Map<String, Object> ids, EntityModel entityModel) {
-        super(datastore, mapper);
+    public MapReference(EntityCache cache, Datastore datastore, Mapper mapper, Map<String, Object> ids, EntityModel entityModel) {
+        super(cache, datastore, mapper);
         for (Entry<String, Object> entry : ids.entrySet()) {
             CollectionReference.collate(entityModel, collections, entry.getValue());
         }
@@ -72,7 +73,7 @@ public class MapReference<T> extends MorphiaReference<Map<Object, T>> {
         final Map<String, Object> ids = (Map<String, Object>) property.getDocumentValue(document);
         MapReference reference = null;
         if (ids != null) {
-            reference = new MapReference(datastore, mapper, ids, mapper.getEntityModel(subType));
+            reference = new MapReference(EntityCache.get(), datastore, mapper, ids, mapper.getEntityModel(subType));
         }
 
         return reference;
