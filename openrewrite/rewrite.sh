@@ -16,7 +16,8 @@ prepareWorkspace() {
   rm -rf $workspace
 
   mkdir -p $workspace
-  cp src/test/resources/test-pom.xml $workspace
+  cp src/test/resources/test-pom.xml $workspace/pom.xml
+  cp rewrite.yml $workspace
   test="$workspace/src/test/java"
   mkdir -p $test
   cp -r $core/src/test/java/* $test
@@ -31,9 +32,10 @@ clone
 prepareWorkspace
 showDiff
 
+cd $workspace
 mvn org.openrewrite.maven:rewrite-maven-plugin:runNoFork \
-                    -Drewrite.configLocation=`pwd`/rewrite.yml \
                     -Drewrite.activeRecipes=dev.morphia.experimental
+cd -
 
 showDiff
 #mvn -f $workspace/pom.xml test-compile
