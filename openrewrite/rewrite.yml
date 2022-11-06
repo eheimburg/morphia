@@ -14,7 +14,7 @@ recipeList:
       oldPackageName: dev.morphia.query.experimental.updates
       newPackageName: dev.morphia.query.updates
       recursive: true
-  - org.openrewrite.java.ChangePackage:
-      oldPackageName: dev.morphia.query
-      newPackageName: dev.morphia.query.updates
-      recursive: true
+#  - org.openrewrite.java.ChangePackage:
+#      oldPackageName: dev.morphia.query
+#      newPackageName: dev.morphia
+#      recursive: true
