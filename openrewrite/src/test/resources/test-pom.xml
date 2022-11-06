@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>morphia.testing</groupId>
+    <artifactId>openrewrite</artifactId>
+    <version>0.1</version>
+
+    <properties>
+        <morphia.version>2.3.0-SNAPSHOT</morphia.version>
+        <testng.version>7.6.1</testng.version>
+        <bottlerocket.version>0.41.0</bottlerocket.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                    <compilerArgument>-proc:none</compilerArgument>
+                    <compilerArgument>-Xlint:deprecation</compilerArgument>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.openrewrite.maven</groupId>
+                <artifactId>rewrite-maven-plugin</artifactId>
+                <version>4.36.0</version>
+                <configuration>
+                    <activeRecipes>
+                        <recipe>dev.morphia.experimental</recipe>
+                    </activeRecipes>
+                    <configLocation>${project.basedir}/rewrite.yml</configLocation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>dev.morphia.morphia</groupId>
+            <artifactId>morphia-core</artifactId>
+            <version>${morphia.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.morphia.morphia</groupId>
+            <artifactId>morphia-core</artifactId>
+            <version>${morphia.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.antwerkz.bottlerocket</groupId>
+            <artifactId>bottlerocket</artifactId>
+            <version>${bottlerocket.version}</version>
+        </dependency>
+    </dependencies>
+</project>

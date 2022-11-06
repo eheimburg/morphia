@@ -1,0 +1,20 @@
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: dev.morphia.experimental
+recipeList:
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: dev.morphia.query.experimental
+      newPackageName: dev.morphia.query
+      recursive: true
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: dev.morphia.aggregation.experimental
+      newPackageName: dev.morphia.aggregation
+      recursive: true
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: dev.morphia.query.experimental.updates
+      newPackageName: dev.morphia.query.updates
+      recursive: true
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: dev.morphia.query
+      newPackageName: dev.morphia.query.updates
+      recursive: true
