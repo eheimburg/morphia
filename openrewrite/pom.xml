@@ -13,6 +13,12 @@
 
     <artifactId>openrewrite</artifactId>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+
+        <jgit.version>6.3.0.202209071007-r</jgit.version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -149,6 +155,14 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.zeroturnaround</groupId>
+            <artifactId>zt-exec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
         </dependency>
     </dependencies>
 </project>
