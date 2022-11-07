@@ -35,6 +35,7 @@
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
 
+<!--
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -66,12 +67,12 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.5.1</version>
                 <executions>
-                    <!-- Replacing default-compile as it is treated specially by maven -->
+                    &lt;!&ndash; Replacing default-compile as it is treated specially by maven &ndash;&gt;
                     <execution>
                         <id>default-compile</id>
                         <phase>none</phase>
                     </execution>
-                    <!-- Replacing default-testCompile as it is treated specially by maven -->
+                    &lt;!&ndash; Replacing default-testCompile as it is treated specially by maven &ndash;&gt;
                     <execution>
                         <id>default-testCompile</id>
                         <phase>none</phase>
@@ -93,13 +94,16 @@
                 </executions>
             </plugin>
         </plugins>
+-->
     </build>
 
     <dependencies>
+<!--
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
         </dependency>
+-->
 
         <!-- rewrite-java dependencies only necessary for Java Recipe development -->
         <dependency>

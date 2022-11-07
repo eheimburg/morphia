@@ -2,7 +2,7 @@
 type: specs.openrewrite.org/v1beta/recipe
 name: dev.morphia.experimental
 recipeList:
-  - org.openrewrite.java.ChangePackage:
+  - org.openrewrite.java.ChangeType:
       oldPackageName: dev.morphia.query.experimental
       newPackageName: dev.morphia.query
       recursive: true
